@@ -37,9 +37,6 @@ namespace ByteBank.View
             //Aula01_ExemploDeThread();
             //Aula02_ExemploDeTask();
             Aula03_UsandoAsyncAwait();
-
-
-
         }
 
         private async void Aula03_UsandoAsyncAwait()
@@ -106,7 +103,7 @@ namespace ByteBank.View
         {
             BtnProcessar.IsEnabled = false;
 
-            //O TaskScheduler."FromCurrentSynchronizationContext() - obtem o contexto da thread que está aatuando no comento"
+            //O TaskScheduler."FromCurrentSynchronizationContext() - obtem o contexto da thread que está atuando no momento"
             var _taskSchedulerUI = TaskScheduler.FromCurrentSynchronizationContext();
             var contas = r_Repositorio.GetContaClientes();
 
@@ -133,14 +130,18 @@ namespace ByteBank.View
             //Com o 'WhenAll', é possivel retornar uma tarefa que será liberada somente quando todas as tarefas do array estiverem liberadas
             //com este metodo é possivel não travar a view 
 
-
+            /*Pode ser utilizado quando o Método não pode conter a assinatura async e nem Task.
+              desta forma, conseguimos execultar tarefaz assincronas, sem necessariamente marcar como async ou await,
+              neste caso do WhenAll ele para a execusão da tread principal, e aguarda todas as tarefas serem concluidas, 
+              assim como o await.
+            */
             Task
                 .WhenAll(contasTarefas)
                 .ContinueWith(task => //ContinueWith será execuldado somente quando todas as tarefas anteriores forem completadas,                                    
                 {                     //O ContinueWith ecebe como parametro uma Task (Tarefa), que é justamente a que originou o metodo
                     var fim = DateTime.Now;
                     AtualizarView(resultado, fim - inicio);
-                }, _taskSchedulerUI)
+                }, _taskSchedulerUI)//_taskSchedulerUI => Informa qual é a thread na qual eu quero que seja execultada esta tarefa.
                 .ContinueWith(task =>
                 {
                     BtnProcessar.IsEnabled = true;
